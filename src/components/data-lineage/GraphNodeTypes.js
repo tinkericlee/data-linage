@@ -11,10 +11,9 @@ export const DataLineageGraphNode = memo(({data}) => {
                 </Tooltip>
             }>
              <div style={{
-                border: '2px solid green',
+                border: '2px solid blue',
                 borderRadius: 6,
                 padding: "18px 30px",
-                animation: 'glow 1800ms ease-out infinite alternate',
                 minWidth: '180px'
                 }}>
                 <Handle
