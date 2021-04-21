@@ -29,10 +29,40 @@ export const DataLineageGraphNode = memo(({data}) => {
                 />
             </div>
         </OverlayTrigger>
-           
+    );
+});
+
+export const NotUsedDataLineageGraphNode = memo(({data}) => {
+    return (
+        <OverlayTrigger
+            overlay={
+                <Tooltip id={`tooltip-${data.id}`}>
+                    {data.comment}
+                </Tooltip>
+            }>
+             <div style={{
+                border: '2px dashed blue',
+                borderRadius: 6,
+                padding: "18px 30px",
+                minWidth: '180px'
+                }}>
+                <Handle
+                    type="target"
+                    position="left"
+                />
+                <div>
+                    {data.label}
+                </div>
+                <Handle
+                    type="source"
+                    position="right"
+                />
+            </div>
+        </OverlayTrigger>
     );
 });
 
 export const nodeTypes = {
     dataLineageGraphNode: DataLineageGraphNode,
+    notUsedDataLineageGraphNode: NotUsedDataLineageGraphNode
 };

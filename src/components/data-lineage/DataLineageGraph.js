@@ -34,14 +34,14 @@ export default class DataLineageGraph extends Component {
 
     onElementsRemove = (elementsToRemove) =>
         this.setState({ nodes: removeElements(elementsToRemove, this.state.nodes) });
-    onConnect = (params) => this.setState({ nodes: addEdge(Object.assign({ animated: true, label: "label", data: { comment: "Comment" } }, params), this.state.nodes) });
+    onConnect = (params) => this.setState({ nodes: addEdge(Object.assign({label: "label", data: { comment: "Comment" } }, params), this.state.nodes) });
 
     onAdd = () => {
         var maxId = 0
         this.state.nodes.forEach(n => { maxId = parseInt(n.id) > maxId ? parseInt(n.id) : maxId })
         const newNode = {
             id: maxId + 1 + '',
-            data: { id: maxId + 1 + '', label: 'New Node', comment: 'Comment' },
+            data: { id: maxId + 1 + '', label: 'New Node', comment: 'Comment', notInUse: false },
             type: 'dataLineageGraphNode',
             position: {
                 x: 100,
@@ -65,6 +65,7 @@ export default class DataLineageGraph extends Component {
         e.preventDefault()
         const formData = new FormData(e.target)
         const formDataObj = Object.fromEntries(formData.entries())
+        console.log(formDataObj)
 
         if (formDataObj.id) {
             let newNodes = this.removeItemById(this.state.nodes, this.state.selectedNode.id).concat(
@@ -73,14 +74,17 @@ export default class DataLineageGraph extends Component {
                         {
                             label: formDataObj.label,
                             data: {
-                                comment: formDataObj.comment
+                                comment: formDataObj.comment,
+                                notInUse: formDataObj.notInUse ? "on" : "off"
                             }
                         } :
                         {
                             data: {
                                 label: formDataObj.label,
-                                comment: formDataObj.comment
-                            }
+                                comment: formDataObj.comment,
+                                notInUse: formDataObj.notInUse ? "on" : "off"
+                            },
+                            type: formDataObj.notInUse == "on" ? 'notUsedDataLineageGraphNode' : 'dataLineageGraphNode'
                         })
             )
 
@@ -99,6 +103,17 @@ export default class DataLineageGraph extends Component {
             }
         }
         return arr;
+    }
+
+    getItemById(arr, id) {
+        var i = 0;
+        while (i < arr.length) {
+            if (arr[i].id === id) {
+                return arr[i]
+            } 
+            ++i;
+        }
+        return undefined;
     }
 
     onNodeJsonUpdate = (e) => {
@@ -158,11 +173,18 @@ export default class DataLineageGraph extends Component {
                                     <Form.Control name="id" type="text" readOnly defaultValue={this.state.selectedNode.id} />
                                 </Col>
                             </Form.Group>
+                            
+                            <Form.Group as={Row} controlId="notInUse">
+                                <Form.Label column sm={2}>Not in use</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Check custom name="notInUse" type="checkbox" defaultChecked={this.state.selectedNode.data.notInUse == "on"} />
+                                </Col>
+                            </Form.Group>
 
                             <Form.Group as={Row} controlId="label">
                                 <Form.Label column sm={2}>Label</Form.Label>
                                 <Col sm={10}>
-                                    <Form.Control name="label" type="text" defaultValue={this.state.selectedNode.source? this.state.selectedNode.label : this.state.selectedNode.data.label}/>
+                                    <Form.Control name="label" type="text" defaultValue={this.getItemById(this.state.nodes, this.state.selectedNode.id)? this.state.selectedNode.source ? this.getItemById(this.state.nodes, this.state.selectedNode.id).label : this.state.selectedNode.data.label : undefined}/>
                                 </Col>
                             </Form.Group>
 
